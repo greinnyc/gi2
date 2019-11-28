@@ -1,0 +1,9 @@
+
+.logo-login {
+    width: 50px;
+    position: absolute;
+    top: -58px;
+    left: 151px;
+    height: 50px;
+    filter: invert(93%) sepia(38%) saturate(127%) hue-rotate(276deg) brightness(100%) contrast(95%);
+}
