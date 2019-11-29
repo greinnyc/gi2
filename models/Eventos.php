@@ -209,8 +209,9 @@ class Eventos extends \yii\db\ActiveRecord
             from DB_Invitado.dbo.tarea
             where activo = 1")->queryAll();
         return $query;
-        
     }
+
+
 
     
     

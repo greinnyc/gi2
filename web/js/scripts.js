@@ -1,3 +1,34 @@
+function uploadFile(){
+	var formData = new FormData();
+	//var documento = $('#eventos-file');
+	//var documento = document.getElementById('eventos-file');
+	var documento = $("#eventos-file").prop("files")[0]; 
+	console.log(documento)
+	formData.append("file", documento);
+	console.log(formData);
+	var url = $('.file_url').attr('id');
+	console.log(url);
+	$.ajax({
+		url: url,
+		type: "post",
+		enctype: 'multipart/form-data',
+		data: formData,
+		contentType: false,
+        cache: false,
+        processData: false,
+	})
+	.done(function(res){
+		console.log(res);
+	});
+
+	
+
+
+	//formData.append("dato", "valor");
+
+}
+
+
 //selecciona un empleado del staff del evento para editarlo
 function selecionarEmpleadoStaff(id){
 	var url =$('.staff_empleado_url').attr('id');
@@ -17,6 +48,7 @@ function selecionarEmpleadoStaff(id){
 	});
 }
 
+//agrega o edita un empleado del staff de un evento
 function saveEmpleadoStaff(){
 	var empleado_staff = $('#staff_empleado').val();
 	var tarea_staff = $('#staff_tarea').val();
@@ -39,12 +71,6 @@ function saveEmpleadoStaff(){
 	$('#id_staff').val(0);
 
 }
-
- 
-
-
-
-
 	
 var items_obj = [];
 function agregarItems(){

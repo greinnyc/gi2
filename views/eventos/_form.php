@@ -49,6 +49,8 @@ $this->registerJs($js);
     <?= Html::input('hidden','save_staff_empleado','', $options=['class'=>'form-control save_staff_empleado', 'id'=>Url::to(['staff-evento/save-staff-empleado-evento'])]) ?>
     <?= Html::input('hidden','id_staff','0', $options=['class'=>'form-control', 'id'=>'id_staff']) ?>
     <?= Html::input('hidden','evento_codigo',$model->evento_codigo, $options=['class'=>'form-control', 'id'=>'evento_codigo']) ?>
+    <?= Html::input('hidden','file_url','', $options=['class'=>'form-control file_url', 'id'=>Url::to(['eventos/masivo-invitados'])]) ?>
+
 
 
 
@@ -270,10 +272,22 @@ $this->registerJs($js);
                 </div>
             </div>
             <div id="invitados" class="tab-pane fade">
-                 <?= $form->field($model, 'file')->fileInput()->label('Carga de Invitados') ?>
-                <!--<?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <?= $form->field($model, 'file')->fileInput()->label('Carga de Invitados') ?>
+
+                    </div>
+                    <div class="col-12">
+                        <?= Html::button('Cargar', array('onclick' => 'js:uploadFile()','class' => 'btn btn-primary'));?>
+                    </div>
+                </div>
+
+
+                <!--<?php $form = ActiveForm::begin(['id' => 'fileSave','options' => ['enctype' => 'multipart/form-data'],'action' => Yii::$app->urlManager->createUrl(['evento/masivo-invitados'])]); ?>
 
                     <div class="form-group">
+                        <?= $form->field($model, 'file')->fileInput()->label('Carga de Invitados') ?>
+
                         <?= Html::submitButton('<i class="glyphicon glyphicon-upload" >Cargar</i>', ['class' => 'btn btn-primary']) ?>
                     </div>
                 <?php ActiveForm::end(); ?>-->

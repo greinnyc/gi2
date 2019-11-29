@@ -8,11 +8,15 @@ use app\models\Sedes;
 use app\models\ProgramacionEvento;
 use app\models\ItemsCatalogo;
 use app\models\ItemsEvento;
+use app\models\EmpleadoGI;
 use app\models\EventosSearch;
+use app\models\UploadForm;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\Helper;
+use yii\web\UploadedFile;
+use yii\helpers\Url;
 
 
 /**
@@ -106,8 +110,8 @@ class EventosController extends Controller
             if($model->validate()){
                 if($model->save()){
                     
-                    //var_dump($_POST['Eventos']);
-                    //exit();
+                    var_dump($_POST);
+                    exit();
                     $model->fecha_modificacion = Helper::getDateTimeNow();
                     $model->usuario_modificacion =Helper::getUserDefault();
                     //Guardando Programacion de Evento
@@ -180,5 +184,44 @@ class EventosController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionMasivoInvitados(){
+        error_log("actionMasivoInvitados***************");
+        $EmpleadoGI = new EmpleadoGI();
+        //error_log(print_r($_POST,1));
+        //error_log(print_r($_FILES['file']['name'],1));
+        $tmp_file = $_FILES['file']['tmp_name'];
+        $ruta_archivo = './uploads/'. $_FILES['file']['name'];
+        //error_log($ruta_archivo);
+        move_uploaded_file($tmp_file, $ruta_archivo);
+        $fp  = fopen($ruta_archivo, "r");
+        while (!feof($fp)) {
+            $line = fgets($fp);
+            $line     = trim($line," \t\n\r");
+            $EmpleadoGI->numero_documento = $line;
+            $datosEmpleado = $EmpleadoGI->getEmpleadoDNI();
+            //error_log(print_r($datosEmpleado,1));
+
+        }
+            /*$fp  = fopen($ruta_archivo, "r");
+                while ( $line = fgets($fp, 10)){
+                    error_log('empieza');
+                    error_log($line);
+                }*/
+            
+        /*$model = new UploadForm();  
+
+        $model_evento    = new Eventos();
+        error_log(print_r($_FILES,1));
+        if (Yii::$app->request->isPost) {
+            $model->file = UploadedFile::getInstance($model, 'file');
+            $ruta_archivo = '@web/uploads/' . $_FILES['file']['name'];
+            $model->file->saveAs($ruta_archivo);
+            $fp  = fopen($ruta_archivo, "r");
+            while ( $line = fgets($fp, 1000)){
+                error_log($line);
+            }
+        }*/
     }
 }
