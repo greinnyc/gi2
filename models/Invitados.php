@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\Expression;
+
 
 /**
  * This is the model class for table "invitados".
@@ -101,4 +103,46 @@ class Invitados extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ItemsInvitado::className(), ['invitado_codigo' => 'invitado_codigo']);
     }
+
+
+    public function MasivoInvitadosEvento($invitados){
+        error_log("MasivoInvitadosEvento*****");
+        error_log(print_r($invitados,1));
+        foreach ($invitados as $value) {
+            $this->empleado_codigo = $value[0]['empleado_codigo'];
+            $this->activo = ($value[0]['estado_codigo'] == 1)?$value[0]['estado_codigo']:0;;
+            $this->AddInvitadoEvento();
+        }
+    }
+
+    public function AddInvitadoEvento(){
+        $query = Yii::$app->db->createCommand("SELECT case when max(invitado_codigo) is null then 1 else max(invitado_codigo)+1 end as id 
+            from DB_Invitado.dbo.invitados")->queryAll();
+        $this->invitado_codigo = $query[0]['id'];
+
+        Yii::$app->db_invitado->createCommand()->insert('DB_Invitado.dbo.invitados', [
+                                            'invitado_codigo' => $this->invitado_codigo,
+                                            'evento_codigo' => $this->evento_codigo,
+                                            'empleado_codigo'=>$this->empleado_codigo,
+                                            'activo'=>$this->activo,
+                                            'usuario_registro'=>$this->usuario_registro,
+                                            'fecha_registro'=>new Expression("getdate()"),
+                                            'usuario_modificacion'=>$this->usuario_modificacion,
+                                            'fecha_modificacion'=>new Expression("getdate()")                                            
+        ])->execute();
+    }
+
+    public function getExisteInvitadosEvento(){
+        $query = Yii::$app->db->createCommand("SELECT COUNT(*) as cantidad
+            from DB_Invitado.dbo.invitados
+            WHERE evento_codigo =".$this->evento_codigo)->queryAll();
+        $cantidad = $query[0]['cantidad'];
+        if($cantidad > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    
 }

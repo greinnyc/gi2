@@ -41,6 +41,8 @@ class Eventos extends \yii\db\ActiveRecord
     public $staff_tarea;
     public $estado_staff_empleado;
     public $table_program_data;
+    public $invitado_empleado;
+    public $estado_invitado_empleado;
 
 
 
@@ -66,7 +68,7 @@ class Eventos extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['evento_codigo', 'organizacion_codigo', 'nombre', 'Estado_codigo', 'usuario_registro', 'usuario_modificacion', 'fecha_modificacion', 'fecha_registro'], 'required'],
+            [['evento_codigo', 'organizacion_codigo', 'nombre', 'Estado_codigo', 'usuario_registro', 'usuario_modificacion', 'fecha_modificacion', 'fecha_registro','sede','ubicacion_sede'], 'required'],
             [['evento_codigo', 'organizacion_codigo', 'Estado_codigo', 'usuario_registro', 'usuario_modificacion'], 'integer'],
             [['fecha_modificacion', 'fecha_registro'], 'safe'],
             [['nombre'], 'string', 'max' => 255],
@@ -90,6 +92,9 @@ class Eventos extends \yii\db\ActiveRecord
             'usuario_modificacion' => 'Usuario Modificacion',
             'fecha_modificacion' => 'Fecha Modificacion',
             'fecha_registro' => 'Fecha Registro',
+            'ubicacion_sede'=>'Ubicación',
+            'sede'=>'Sede'
+
         ];
     }
 
@@ -209,6 +214,45 @@ class Eventos extends \yii\db\ActiveRecord
             from DB_Invitado.dbo.tarea
             where activo = 1")->queryAll();
         return $query;
+    }
+
+    public function getInvitadosEvento($id){
+
+        $dataProvider = new SqlDataProvider([
+            'sql' => "SELECT i.invitado_codigo, e.nombre, e.apellido_materno,e.apellido_paterno,e.estado_codigo,e.numero_documento
+                from DB_Invitado.dbo.invitados i
+                LEFT JOIN empleado e on e.empleado_codigo = i.empleado_codigo
+                where i.evento_codigo =:evento_codigo",
+            'db' => Yii::$app->db_invitado,
+            'pagination' => ['pageSize' => 10],
+           'params' => [':evento_codigo' => $id],
+        ]);
+       return $dataProvider;
+    }
+
+    public function getEmpleadosEvento($id){
+        $query = Yii::$app->db_invitado->createCommand(" SELECT i.invitado_codigo as Codigo,e.numero_documento+' - '+e.nombre+' '+e.apellido_materno+' '+e.apellido_paterno as Descripcion
+                from DB_Invitado.dbo.invitados i
+                LEFT JOIN empleado e on e.empleado_codigo = i.empleado_codigo
+                where i.evento_codigo =".$id)->queryAll();
+        return $query;
+    }
+
+    public function getNextRecord()
+    {
+        $model2 = $this->find()->orderBy(['evento_codigo' => SORT_DESC])->one();
+
+        if($model2 !== null) {
+
+             $codigo  = $model2->evento_codigo+1;
+        
+        }else {
+
+             $codigo  = 1;
+        
+        }
+        return $codigo;
+
     }
 
 

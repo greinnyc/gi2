@@ -55,6 +55,9 @@ function agregarProgramacion(){
             "lengthMenu": [ 4 ],
             "info":     false,
             "paging":false,
+            "language": {
+		        "zeroRecords": "No se encontraron resultados.",
+		    },
             data:  array_datatable,
             columns: [
                         { title: "Fecha Inicial" },
@@ -109,8 +112,6 @@ function cargarDatatableProgramacion(){
                 var array_obj = []
                 var ind = 0;
                 data[0].forEach( function(valor, indice, array) {
-                	console.log(indice);
-                	console.log(valor.fecha_inicial);
                     var btn = '<a class="btn-editar-programa" id="btn-'+ind+'"><span class="glyphicon glyphicon-pencil" title="Editar"></span></a>';
                 	//valores de un programa
                 	data_datatable = [];
@@ -155,6 +156,9 @@ function cargarDatatableProgramacion(){
 			            "info":     false,
 			            "paging":false,
 			            data:  array_datatable,
+			            "language": {
+					        "zeroRecords": "No se encontraron resultados.",
+					    },
 			            columns: [
 			                        { title: "Fecha Inicial" },
 			                        { title: "Fecha Final" },

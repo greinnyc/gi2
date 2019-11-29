@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\Expression;
+
 
 /**
  * This is the model class for table "items_evento".
@@ -100,7 +102,7 @@ class ItemsEvento extends \yii\db\ActiveRecord
 
 
 
-     public function MasivoItemsEvento($items){
+    public function MasivoItemsEvento($items){
         foreach ($items as $value) {
             $this->item_codigo = $value['item_codigo'];
             $this->cantidad = $value['item_cantidad'];
@@ -141,7 +143,7 @@ class ItemsEvento extends \yii\db\ActiveRecord
             from DB_Invitado.dbo.items_evento")->queryAll();
         $this->item_evento_codigo = $query[0]['id'];
 
-        Yii::$app->db_invitado->createCommand()->insert('DB_Invitado.dbo.programacion_evento', [
+        Yii::$app->db_invitado->createCommand()->insert('DB_Invitado.dbo.items_evento', [
                                             'item_evento_codigo' => $this->item_evento_codigo,
                                             'item_codigo'=>$this->item_codigo,
                                             'evento_codigo' => $this->evento_codigo,
@@ -150,10 +152,8 @@ class ItemsEvento extends \yii\db\ActiveRecord
                                             'activo'=>$this->activo,
                                             'usuario_registro'=>$this->usuario_registro,
                                             'fecha_registro'=>new Expression("getdate()"),
-                                            'usuario_modificacion'=>$this->usuario_modifica,
+                                            'usuario_modificacion'=>$this->usuario_modificacion,
                                             'fecha_modificacion'=>new Expression("getdate()")                                            
         ])->execute();
-
-       
     }
 }

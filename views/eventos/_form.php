@@ -27,6 +27,7 @@ use yii\widgets\Pjax;
 $js = <<<JS
     cargarDatatable();
     cargarDatatableProgramacion();
+    cargaDatatableInvitados();
 JS;
 
 $this->registerJs($js);
@@ -36,10 +37,12 @@ $this->registerJs($js);
 
 
 <div class="eventos-form">
-
+    <?php $model_invitados->evento_codigo = $model->evento_codigo;?>
+    <?php $countInvitados = $model_invitados->getExisteInvitadosEvento();?>
     <?php $form = ActiveForm::begin(['id'=>'eventos']); ?>
 
     <?= Html::input('hidden','table_items_data','', $options=['class'=>'form-control', 'id'=>'table_items_data']) ?>
+    <?= Html::input('hidden','table_invitados_data','', $options=['class'=>'form-control', 'id'=>'table_invitados_data']) ?>
     <?= Html::input('hidden','table_program_data','', $options=['class'=>'form-control', 'id'=>'table_program_data']) ?>
     <?= Html::input('hidden','id_item','', $options=['class'=>'form-control', 'id'=>'id_item']) ?>
     <?= Html::input('hidden','id_programa','', $options=['class'=>'form-control', 'id'=>'id_programa']) ?>
@@ -49,10 +52,7 @@ $this->registerJs($js);
     <?= Html::input('hidden','save_staff_empleado','', $options=['class'=>'form-control save_staff_empleado', 'id'=>Url::to(['staff-evento/save-staff-empleado-evento'])]) ?>
     <?= Html::input('hidden','id_staff','0', $options=['class'=>'form-control', 'id'=>'id_staff']) ?>
     <?= Html::input('hidden','evento_codigo',$model->evento_codigo, $options=['class'=>'form-control', 'id'=>'evento_codigo']) ?>
-    <?= Html::input('hidden','file_url','', $options=['class'=>'form-control file_url', 'id'=>Url::to(['eventos/masivo-invitados'])]) ?>
-
-
-
+    <?= Html::input('hidden','file_url','', $options=['class'=>'form-control file_url', 'id'=>Url::to(['eventos/preview-invitados'])]) ?>
 
     <div class="container">
         <ul class="nav nav-tabs">
@@ -163,7 +163,6 @@ $this->registerJs($js);
                                 </tr>
                             </thead>
                             <tbody>
-                               
                             </tbody>
                         </table>
                         <br>
@@ -272,25 +271,127 @@ $this->registerJs($js);
                 </div>
             </div>
             <div id="invitados" class="tab-pane fade">
-                <div class="row justify-content-center">
-                    <div class="col-12">
-                        <?= $form->field($model, 'file')->fileInput()->label('Carga de Invitados') ?>
+                <div class="row justify-content-center" id='invitados_preview'>
+                    <?php if( $countInvitados == false){?>
+                        <div class="col-12">
+                            <?= $form->field($model, 'file')->fileInput()->label('Carga de Invitados') ?>
+                        </div>
+                        <div class="col-12">
+                            <?= Html::button('Cargar', array('onclick' => 'js:uploadFile()','class' => 'btn btn-primary'));?>
+                        </div>
 
+                    
+                    <div class="col-12" style="text-align:center;margin-top:20px">
+                        <label>INVITADOS DEL EVENTO</label>
+                        <hr  size="2" width="100%" style='margin-top:0px; margin-bottom: 20px;border: 0;border-top: 1px solid #172d44;'>
                     </div>
-                    <div class="col-12">
-                        <?= Html::button('Cargar', array('onclick' => 'js:uploadFile()','class' => 'btn btn-primary'));?>
-                    </div>
+                        <div class="col-12">
+                            <table id="table_invitados" class="table table-striped table-bordered" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Número de Documento</th>
+                                        <th>Nombre</th>
+                                        <th>Apellido Materno</th>
+                                        <th>Apellido Paterno</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php }?>
+                </div>
+                <div class="row justify-content-center" id='invitados_gridview'>
+                    <?php if($countInvitados == true){?>
+                        <div class="col-12 col-md-5">
+                            <?=  $form->field($model, 'invitado_empleado')->widget(Select2::classname(),[   
+                                                    'data' => ArrayHelper::map($model->getEmpleadosEvento($model->evento_codigo), "Codigo","Descripcion"),
+                                                    'language' => 'es',
+                                                    'options' =>[  
+                                                                    'placeholder' => 'Seleccione ',
+                                                                    'id'=>'invitado_empleado'
+                                                                ],
+                                                    'pluginOptions' =>  [
+                                                                            'allowClear' => true,
+                                                                        ]
+                                ])->label('Empleado Invitado');
+                            ?>
+
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <?=  $form->field($model, 'estado_invitado_empleado')->widget(Select2::classname(),[   
+                                                    'data' =>[1=>'activo',2=>'desactivado'],
+                                                    'language' => 'es',
+                                                    'options' =>[  
+                                                                    'placeholder' => 'Seleccione ',
+                                                                    'id'=>'estado_invitado_empleado'
+                                                                ],
+                                                    'pluginOptions' =>  [
+                                                                            'allowClear' => true,
+                                                                        ]
+                                ])->label('Estado');
+                            ?>
+                        </div>
+                        <div class="col-12 col-md-2">
+                            <br>
+                            <?= Html::button('Guardar', array('onclick' => 'js:saveEmpleadoInvitado()','class' => 'btn btn-primary'));?>
+                        </div>
+                        <div class="col-12">
+                            <?php Pjax::begin(['id'=>'invitados_evento','enablePushState'=>false,'timeout'=>5000]); ?>
+                                <?= 
+                                    GridView::widget([
+                                        'dataProvider' => $model->getInvitadosEvento($model->evento_codigo),
+                                        'columns' => 
+                                        [
+                                            [
+                                                'attribute'=>'nombre',
+                                                'label' => 'Nombre',
+                                            ],
+                                            [
+                                                'attribute'=>'apellido_materno',
+                                                'label' => 'Apellido Materno',
+                                            ],
+                                            [
+                                                'attribute'=>'apellido_paterno',
+                                                'label' => 'Apellido Paterno',
+                                            ],
+                                            [
+                                                'attribute'=>'estado_codigo',
+                                                'label' => 'Estado',
+                                            ],
+                                            [
+                                                'class' => 'yii\grid\ActionColumn',
+                                                'template' => '{update}',
+                                                'buttons' => [
+                                                    'update' => function ($url, $model, $key){
+                                                        return Html::a
+                                                                        (   
+                                                                           '<span class="glyphicon glyphicon-pencil" title="Editar"></span>', 
+                                                                            '', 
+                                                                            [
+                                                                                //'data-target'=>'#modalDesAct',
+                                                                                //'data-toggle'=>'modal',
+                                                                                //'class'=>'desAct',
+                                                                                //'style'=>$style,
+                                                                                'onclick'=>'selecionarEmpleadoInvitado('.$model['invitado_codigo'].')'
+                                                                                //'id'=>Url::to(['campanas/detalle-campana','cod_campana' => $model->Cod_Campana,'estado' => $model->Estado])
+                                                                            ]
+                                                                        );
+                                                    }
+                                                ],
+                                            ],
+
+                                          
+                                        ],
+                                    ]) 
+                                ?>
+                            <?php yii\widgets\Pjax::end() ?>
+                        </div>
+                    <?php }?>
+                    
                 </div>
 
-
-                <!--<?php $form = ActiveForm::begin(['id' => 'fileSave','options' => ['enctype' => 'multipart/form-data'],'action' => Yii::$app->urlManager->createUrl(['evento/masivo-invitados'])]); ?>
-
-                    <div class="form-group">
-                        <?= $form->field($model, 'file')->fileInput()->label('Carga de Invitados') ?>
-
-                        <?= Html::submitButton('<i class="glyphicon glyphicon-upload" >Cargar</i>', ['class' => 'btn btn-primary']) ?>
-                    </div>
-                <?php ActiveForm::end(); ?>-->
 
             </div>
             <div id="staff" class="tab-pane fade">
@@ -341,6 +442,10 @@ $this->registerJs($js);
                     <div class="col-12 col-md-1">
                         <br>
                         <?= Html::button('Guardar', array('onclick' => 'js:saveEmpleadoStaff()','class' => 'btn btn-primary'));?>
+                    </div>
+                     <div class="col-12" style="text-align:center;margin-top:20px">
+                        <label>STAFF DEL EVENTO</label>
+                        <hr  size="2" width="100%" style='margin-top:0px; margin-bottom: 20px;border: 0;border-top: 1px solid #172d44;'>
                     </div>
                     <div class="col-12">
                         <?php Pjax::begin(['id'=>'staff_evento','enablePushState'=>false,'timeout'=>5000]); ?>
@@ -407,6 +512,8 @@ $this->registerJs($js);
     <br>
     <div class="form-group" style="text-align: center">
         <?= Html::submitButton('Aceptar', ['class' => 'btn btn-primary','id'=>'btn_guardar', 'name'=>'btn_guardar']) ?>
+        <?= Html::button('Cancelar', array('onclick' => 'js:document.location.href="index"','class' => 'btn btn-secondary'));?>
+
     </div>
 
     <?php ActiveForm::end(); ?>

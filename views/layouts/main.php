@@ -11,7 +11,14 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use yii\helpers\Url;
 
+
+
 AppAsset::register($this);
+
+$js=<<< JS
+    $(".alert").animate({opacity: 2.0}, 1500).fadeOut("slow");
+JS;
+$this->registerJs($js, yii\web\View::POS_READY);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -26,6 +33,23 @@ AppAsset::register($this);
 </head>
 <body class="hold-transition sidebar-mini">
 <?php $this->beginBody() ?>
+
+<?php if (Yii::$app->session->hasFlash('flashMsgExito')){ ?>
+  
+<div class="alert alert-success alert-dismissable" style="position: absolute;width: 68%;right: 200px">
+     <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+     <?= Yii::$app->session->getFlash('flashMsgExito') ?>
+</div>
+                                    
+<?php } ?>
+
+<?php if (Yii::$app->session->hasFlash('flashMsgError')){ ?>
+<div class="alert alert-danger alert-dismissable" style="position: absolute;width: 68%;right: 200px">
+     <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+     <?= Yii::$app->session->getFlash('flashMsgError') ?>
+</div>
+                                    
+<?php } ?>
 
 <div class="wrapper">
   <!-- Navbar -->

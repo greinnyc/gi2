@@ -1,13 +1,33 @@
+function cargaDatatableInvitados(){
+	var table = $('#table_invitados').DataTable();
+    table.destroy();   
+    $('#table_invitados').DataTable( {
+            'responsive': true,
+            "searching": false,
+            "lengthChange": false,
+            "ordering": false,
+            "lengthMenu": [ 10 ],
+            "info":     false,
+            "paging":true,
+            "language": {
+		        "zeroRecords": "No se encontraron resultados.",
+		    },
+            data:  [],
+            columns: [
+            			{title: "Número de Documento"},
+                        { title: "Nombre" },
+                        { title: "Apelllido Materno" },
+                        { title: "Apellido Paterno" },
+                        { title: "Estado" },
+                    ]
+    });
+}
+
 function uploadFile(){
 	var formData = new FormData();
-	//var documento = $('#eventos-file');
-	//var documento = document.getElementById('eventos-file');
 	var documento = $("#eventos-file").prop("files")[0]; 
-	console.log(documento)
 	formData.append("file", documento);
-	console.log(formData);
 	var url = $('.file_url').attr('id');
-	console.log(url);
 	$.ajax({
 		url: url,
 		type: "post",
@@ -18,11 +38,53 @@ function uploadFile(){
         processData: false,
 	})
 	.done(function(res){
-		console.log(res);
+		$('#invitados_preview').show();
+		$('#invitados_gridview').hide();
+		array_datatable = []
+		res.forEach( function(valor, indice, array) {
+        var data_datatable = [];
+    	data_datatable = [
+                            valor[0]['numero_documento'],
+                            valor[0]['nombre'],
+                            valor[0]['apellido_materno'],
+                            valor[0]['apellido_paterno'],
+                            valor[0]['estado_codigo'],
+                         ]
+        array_datatable.push(data_datatable);
+
+    });
+	$('#table_invitados_data').val(JSON.stringify(res));
+	var table = $('#table_invitados').DataTable();
+    table.destroy();   
+    $('#table_invitados').DataTable( {
+            'responsive': true,
+            "searching": false,
+            "lengthChange": false,
+            "ordering": false,
+            "lengthMenu": [ 10 ],
+            "info":     false,
+            "paging":true,
+            "language": {
+		        "zeroRecords": "No se encontraron resultados.",
+		    },
+            data:  array_datatable,
+            columns: [
+            			{title: "Número de Documento"},
+                        { title: "Nombre" },
+                        { title: "Apelllido Materno" },
+                        { title: "Apellido Paterno" },
+                        { title: "Estado" },
+                    ]
+    });
+		/*$.pjax.reload({
+                url:'list-unidades-servicios?id='+$('#campanasagrupacion-ca_codigo').val(),
+                container:"#invitados_evento",
+                replace: false,
+                push:false,
+                timeout:5000
+
+        	});*/
 	});
-
-	
-
 
 	//formData.append("dato", "valor");
 
@@ -33,11 +95,9 @@ function uploadFile(){
 function selecionarEmpleadoStaff(id){
 	var url =$('.staff_empleado_url').attr('id');
 	url = url+'?empleadoStaff='+id;
-	//console.log(url+'?empleadoStaff='+id);
 
 	$.post(url, function( data ) {
 		data.forEach( function(valor, indice, array) {
-			console.log(valor);
 			$('#staff_empleado').val(valor.empleado_codigo).trigger('change');
 			$('#staff_tarea').val(valor.tarea_codigo).trigger('change');
 			$('#estado_staff_empleado').val(valor.activo).trigger('change');
@@ -135,6 +195,9 @@ function agregarItems(){
             "lengthMenu": [ 4 ],
             "info":     false,
             "paging":false,
+            "language": {
+		        "zeroRecords": "No se encontraron resultados.",
+		    },
             data:  array_datatable,
             columns: [
                         { title: "Nombre" },
@@ -178,6 +241,7 @@ $(document).on('click', '.btn-editar-item', function(id){
 
 
 function cargarDatatable(){
+
 	$.post($('.item_url').attr('id'), function( data ) {
         data = [data.data];
         var array_datatable = []
@@ -221,8 +285,11 @@ function cargarDatatable(){
 	            "lengthChange": false,
 	            "ordering": false,
 	            "lengthMenu": [ 4 ],
-	            "info":     false,
+	            "info":false,
 	            "paging":false,
+	            "language": {
+		            "zeroRecords": "No se encontraron resultados.",
+		        },
 	            data:  array_datatable,
 	            columns: [
 	                        { title: "Nombre" },
