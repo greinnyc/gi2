@@ -1,3 +1,42 @@
+//selecciona un empleado del staff del evento para editarlo
+function selecionarEmpleadoInvitado(id){
+	var url =$('.invitado_empleado_url').attr('id');
+	url = url+'?empleadoInvitado='+id;
+
+	$.post(url, function( data ) {
+		data.forEach( function(valor, indice, array) {
+			console.log(valor)
+			$('#invitado_empleado').val(valor.empleado_codigo).trigger('change');
+			$('#estado_invitado_empleado').val(valor.activo).trigger('change');
+			$('#id_invitado').val(id);
+
+
+		});
+	});
+}
+
+//agrega o edita un empleado del staff de un evento
+function saveEmpleadoInvitado(){
+	var invitado_empleado = $('#invitado_empleado').val();
+	var estado_invitado_empleado = $('#estado_invitado_empleado').val();
+	var id_invitado = $('#id_invitado').val();
+	var evento_codigo = $('#evento_codigo').val();
+	var url =$('.save_invitado_empleado').attr('id');
+	url = url+'?invitado_codigo='+id_invitado+'&codigo_empleado='+invitado_empleado+'&activo='+estado_invitado_empleado+'&evento_codigo='+evento_codigo;
+	$.post(url, function( data ) {
+		$.pjax.reload({
+                container:"#invitados_evento",
+                replace: false,
+                push:false,
+                timeout:5000
+            });
+	});
+	$('#invitado_empleado').val('').trigger('change');
+	$('#estado_invitado_empleado').val('').trigger('change');
+	$('#id_invitado').val(0);
+
+}
+
 function cargaDatatableInvitados(){
 	var table = $('#table_invitados').DataTable();
     table.destroy();   
@@ -48,7 +87,7 @@ function uploadFile(){
                             valor[0]['nombre'],
                             valor[0]['apellido_materno'],
                             valor[0]['apellido_paterno'],
-                            valor[0]['estado_codigo'],
+                            valor[0]['activo'],
                          ]
         array_datatable.push(data_datatable);
 

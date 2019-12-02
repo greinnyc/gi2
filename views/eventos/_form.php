@@ -49,8 +49,13 @@ $this->registerJs($js);
     <?= Html::input('hidden','item_url','', $options=['class'=>'form-control item_url', 'id'=>Url::to(['items-evento/get-items-evento','evento' => $model->evento_codigo])]) ?>
     <?= Html::input('hidden','programacion_url','', $options=['class'=>'form-control programacion_url', 'id'=>Url::to(['programacion-evento/get-programacion-evento','evento' => $model->evento_codigo])]) ?>
     <?= Html::input('hidden','staff_empleado_url','', $options=['class'=>'form-control staff_empleado_url', 'id'=>Url::to(['staff-evento/get-staff-empleado-evento'])]) ?>
+    <?= Html::input('hidden','invitado_empleado_url','', $options=['class'=>'form-control invitado_empleado_url', 'id'=>Url::to(['invitados/get-invitado-empleado-evento'])]) ?>
     <?= Html::input('hidden','save_staff_empleado','', $options=['class'=>'form-control save_staff_empleado', 'id'=>Url::to(['staff-evento/save-staff-empleado-evento'])]) ?>
+    <?= Html::input('hidden','save_invitado_empleado','', $options=['class'=>'form-control save_invitado_empleado', 'id'=>Url::to(['invitados/save-invitado-empleado-evento'])]) ?>
+
     <?= Html::input('hidden','id_staff','0', $options=['class'=>'form-control', 'id'=>'id_staff']) ?>
+    <?= Html::input('hidden','id_invitado','0', $options=['class'=>'form-control', 'id'=>'id_invitado']) ?>
+
     <?= Html::input('hidden','evento_codigo',$model->evento_codigo, $options=['class'=>'form-control', 'id'=>'evento_codigo']) ?>
     <?= Html::input('hidden','file_url','', $options=['class'=>'form-control file_url', 'id'=>Url::to(['eventos/preview-invitados'])]) ?>
 
@@ -306,7 +311,7 @@ $this->registerJs($js);
                     <?php if($countInvitados == true){?>
                         <div class="col-12 col-md-5">
                             <?=  $form->field($model, 'invitado_empleado')->widget(Select2::classname(),[   
-                                                    'data' => ArrayHelper::map($model->getEmpleadosEvento($model->evento_codigo), "Codigo","Descripcion"),
+                                                    'data' => ArrayHelper::map($model->getEmpleados(), "Codigo","Descripcion"),
                                                     'language' => 'es',
                                                     'options' =>[  
                                                                     'placeholder' => 'Seleccione ',
@@ -357,7 +362,7 @@ $this->registerJs($js);
                                                 'label' => 'Apellido Paterno',
                                             ],
                                             [
-                                                'attribute'=>'estado_codigo',
+                                                'attribute'=>'activo',
                                                 'label' => 'Estado',
                                             ],
                                             [

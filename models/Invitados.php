@@ -132,6 +132,20 @@ class Invitados extends \yii\db\ActiveRecord
         ])->execute();
     }
 
+     public function updateInvitadoEvento(){
+        $params =  [
+                    'invitado_codigo' => $this->invitado_codigo,
+                    'activo'=>$this->activo,
+                    'usuario_modificacion'=>$this->usuario_modificacion,
+                    'fecha_modificacion'=>$this->fecha_modificacion                   
+                   ];
+        Yii::$app->db_invitado->createCommand("UPDATE DB_Invitado.dbo.invitados
+            SET activo=:activo, usuario_modificacion=:usuario_modificacion, fecha_modificacion=:fecha_modificacion
+            WHERE invitado_codigo=:invitado_codigo",$params)->execute();
+        return;
+
+    }
+
     public function getExisteInvitadosEvento(){
         $query = Yii::$app->db->createCommand("SELECT COUNT(*) as cantidad
             from DB_Invitado.dbo.invitados
@@ -142,6 +156,26 @@ class Invitados extends \yii\db\ActiveRecord
         }else{
             return false;
         }
+    }
+
+    public function existInvitadoEmpleadoEvento($evento_codigo,$codigo_empleado){
+        $query = Yii::$app->db->createCommand("SELECT invitado_codigo
+            from DB_Invitado.dbo.invitados
+            WHERE evento_codigo = ".$evento_codigo." and empleado_codigo=".$codigo_empleado)->queryAll();
+        if(count($query) > 0){
+            return $query[0]['invitado_codigo'];
+        }else{
+            return false;
+        }
+    }
+
+     public function getInvitadoEmpleadoEvento($empleadoInvitado){
+        
+         $query = Yii::$app->db_invitado->createCommand("SELECT i.invitado_codigo,e.nombre,e.apellido_materno,e.apellido_paterno,i.activo,i.evento_codigo,e.empleado_codigo
+            from DB_Invitado.dbo.invitados i
+            left join empleado e on e.empleado_codigo = i.empleado_codigo
+            where i.invitado_codigo=".$empleadoInvitado)->queryAll();
+        return $query;
     }
 
     

@@ -219,7 +219,7 @@ class Eventos extends \yii\db\ActiveRecord
     public function getInvitadosEvento($id){
 
         $dataProvider = new SqlDataProvider([
-            'sql' => "SELECT i.invitado_codigo, e.nombre, e.apellido_materno,e.apellido_paterno,e.estado_codigo,e.numero_documento
+            'sql' => "SELECT i.invitado_codigo, e.nombre, e.apellido_materno,e.apellido_paterno,i.activo,e.numero_documento
                 from DB_Invitado.dbo.invitados i
                 LEFT JOIN empleado e on e.empleado_codigo = i.empleado_codigo
                 where i.evento_codigo =:evento_codigo",
@@ -253,6 +253,13 @@ class Eventos extends \yii\db\ActiveRecord
         }
         return $codigo;
 
+    }
+
+    public function getEmpleados(){
+        $query = Yii::$app->db_invitado->createCommand("SELECT e.empleado_codigo as Codigo,e.numero_documento+' - '+e.nombre+' '+e.apellido_materno+' '+e.apellido_paterno as Descripcion
+            from DB_Invitado.dbo.empleado e
+        where estado_codigo= 1")->queryAll();
+        return $query;
     }
 
 

@@ -3,20 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Invitados;
-use app\models\InvitadosSearch;
+use app\models\Empleado;
+use app\models\EmpleadoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\Response;
-use app\components\Helper;
-
-
 
 /**
- * InvitadosController implements the CRUD actions for Invitados model.
+ * EmpleadoController implements the CRUD actions for Empleado model.
  */
-class InvitadosController extends Controller
+class EmpleadoController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -34,12 +30,12 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Lists all Invitados models.
+     * Lists all Empleado models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new InvitadosSearch();
+        $searchModel = new EmpleadoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -49,7 +45,7 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Displays a single Invitados model.
+     * Displays a single Empleado model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -62,16 +58,16 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Creates a new Invitados model.
+     * Creates a new Empleado model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Invitados();
+        $model = new Empleado();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->invitado_codigo]);
+            return $this->redirect(['view', 'id' => $model->empleado_codigo]);
         }
 
         return $this->render('create', [
@@ -80,7 +76,7 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Updates an existing Invitados model.
+     * Updates an existing Empleado model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -91,7 +87,7 @@ class InvitadosController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->invitado_codigo]);
+            return $this->redirect(['view', 'id' => $model->empleado_codigo]);
         }
 
         return $this->render('update', [
@@ -100,7 +96,7 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Deletes an existing Invitados model.
+     * Deletes an existing Empleado model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -114,48 +110,18 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Finds the Invitados model based on its primary key value.
+     * Finds the Empleado model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Invitados the loaded model
+     * @return Empleado the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Invitados::findOne($id)) !== null) {
+        if (($model = Empleado::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    
-
-    public function actionSaveInvitadoEmpleadoEvento($invitado_codigo,$codigo_empleado,$activo,$evento_codigo){
-        $model = new Invitados();
-        $model->evento_codigo = $evento_codigo;
-        $model->empleado_codigo = $codigo_empleado;
-        $model->activo = $activo;
-        $model->usuario_modificacion = Helper::getUserDefault();
-        $model->fecha_modificacion = Helper::getDateTimeNow();
-        $model->invitado_codigo = $model->existInvitadoEmpleadoEvento($evento_codigo,$codigo_empleado);
-
-        if($model->invitado_codigo == false){
-            $model->usuario_registro = Helper::getUserDefault();
-            $model->fecha_registro = Helper::getDateTimeNow();                                          
-            $model->AddInvitadoEvento();
-
-        }else{
-            $model->updateInvitadoEvento();
-        }
-          
-    }
-
-     public function actionGetInvitadoEmpleadoEvento($empleadoInvitado){
-        $model = new Invitados();
-        $invitado = $model->getInvitadoEmpleadoEvento($empleadoInvitado);
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        return $invitado;
-       
     }
 }

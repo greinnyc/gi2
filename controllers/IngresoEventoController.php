@@ -3,20 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Invitados;
-use app\models\InvitadosSearch;
+use app\models\IngresoEvento;
+use app\models\IngresoEventoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\Response;
-use app\components\Helper;
-
-
 
 /**
- * InvitadosController implements the CRUD actions for Invitados model.
+ * IngresoEventoController implements the CRUD actions for IngresoEvento model.
  */
-class InvitadosController extends Controller
+class IngresoEventoController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -34,12 +30,12 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Lists all Invitados models.
+     * Lists all IngresoEvento models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new InvitadosSearch();
+        $searchModel = new IngresoEventoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -48,8 +44,10 @@ class InvitadosController extends Controller
         ]);
     }
 
+    
+
     /**
-     * Displays a single Invitados model.
+     * Displays a single IngresoEvento model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -62,16 +60,16 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Creates a new Invitados model.
+     * Creates a new IngresoEvento model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Invitados();
+        $model = new IngresoEvento();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->invitado_codigo]);
+            return $this->redirect(['view', 'id' => $model->ingreso_codigo]);
         }
 
         return $this->render('create', [
@@ -80,7 +78,7 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Updates an existing Invitados model.
+     * Updates an existing IngresoEvento model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -91,7 +89,7 @@ class InvitadosController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->invitado_codigo]);
+            return $this->redirect(['view', 'id' => $model->ingreso_codigo]);
         }
 
         return $this->render('update', [
@@ -100,7 +98,7 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Deletes an existing Invitados model.
+     * Deletes an existing IngresoEvento model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -114,48 +112,29 @@ class InvitadosController extends Controller
     }
 
     /**
-     * Finds the Invitados model based on its primary key value.
+     * Finds the IngresoEvento model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Invitados the loaded model
+     * @return IngresoEvento the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Invitados::findOne($id)) !== null) {
+        if (($model = IngresoEvento::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    
+     /**
+     * muestra vista para registrar ingreso.
+     * @return mixed
+     */
+    public function actionRegistrarIngreso()
+    {
+       //validar si tiene token activo sino preguntar token
 
-    public function actionSaveInvitadoEmpleadoEvento($invitado_codigo,$codigo_empleado,$activo,$evento_codigo){
-        $model = new Invitados();
-        $model->evento_codigo = $evento_codigo;
-        $model->empleado_codigo = $codigo_empleado;
-        $model->activo = $activo;
-        $model->usuario_modificacion = Helper::getUserDefault();
-        $model->fecha_modificacion = Helper::getDateTimeNow();
-        $model->invitado_codigo = $model->existInvitadoEmpleadoEvento($evento_codigo,$codigo_empleado);
-
-        if($model->invitado_codigo == false){
-            $model->usuario_registro = Helper::getUserDefault();
-            $model->fecha_registro = Helper::getDateTimeNow();                                          
-            $model->AddInvitadoEvento();
-
-        }else{
-            $model->updateInvitadoEvento();
-        }
-          
-    }
-
-     public function actionGetInvitadoEmpleadoEvento($empleadoInvitado){
-        $model = new Invitados();
-        $invitado = $model->getInvitadoEmpleadoEvento($empleadoInvitado);
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        return $invitado;
-       
+        return $this->render('registrar-ingreso', []);
     }
 }

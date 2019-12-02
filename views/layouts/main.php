@@ -91,22 +91,11 @@ $this->registerJs($js, yii\web\View::POS_READY);
                with font-awesome or any other icon font library -->
 
           <li class="nav-item">
-            <a href="http://localhost:8003/gestion_invitados/web/index.php/eventos" class="nav-link">
-              <!--<?= Html::a('link text', Url::to('/eventos/index', false))?>-->
-             
-              <i class="far fa-calendar-alt"></i>
-              <p>
-                Creación de Eventos
-              </p>
+              <?= Html::a('<i class="far fa-calendar-alt"></i><p>Creación de Eventos</p>', Url::to(['/eventos/index'], false),['class'=>'nav-link'])?>
             </a>
           </li>
           <li class="nav-item">
-            <a href="../gallery.html" class="nav-link">
-              <i class="fas fa-clipboard-check"></i>
-              <p>
-                Registrar ingreso
-              </p>
-            </a>
+            <?= Html::a('<i class="fas fa-clipboard-check"></i><p>Registrar ingreso</p>', Url::to(['/ingreso-evento/registrar-ingreso'], false),['class'=>'nav-link'])?>
           </li>
           <li class="nav-item">
             <a href="../gallery.html" class="nav-link">
